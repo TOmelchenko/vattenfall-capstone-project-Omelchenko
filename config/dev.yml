@@ -23,6 +23,7 @@ checkpoint_paths:
   market_prices: market_prices_checkpoint
   weather: weather_checkpoint
   grid_events: grid_events_checkpoint  
+  reference: reference_checkpoint
 
 bronze_tables:
   market_prices: bronze_market_prices
