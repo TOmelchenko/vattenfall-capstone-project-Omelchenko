@@ -1,0 +1,12 @@
+bundle:
+  name: vattenfall-capstone-project-Omelchenko
+
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    default: true
+    workspace:
+      https://dbc-578e1af6-806a.cloud.databricks.com/
