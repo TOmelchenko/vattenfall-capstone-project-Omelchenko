@@ -1,0 +1,4 @@
+market_type,description
+DAY_AHEAD,DAY_AHEAD market feed
+INTRADAY,INTRADAY market feed
+BALANCING,BALANCING market feed

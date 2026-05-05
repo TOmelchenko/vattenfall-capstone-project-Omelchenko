@@ -1,0 +1,4 @@
+weather_alert_level,priority_rank
+LOW,1
+MEDIUM,2
+HIGH,3
