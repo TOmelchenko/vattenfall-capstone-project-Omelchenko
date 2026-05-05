@@ -8,7 +8,7 @@ def standardize_market_prices_columns(df: DataFrame) -> DataFrame:
         .withColumn("market_type",     F.upper(F.trim(F.col("market_type"))))
         .withColumn("source_system",   F.upper(F.trim(F.col("source_system"))))
         .withColumn("price_eur_mwh",   F.col("price_eur_mwh").cast("double"))
-        .withColumn("volume_mwh",      F.col("volume_mwh").cast("int"))
+        .withColumn("volume_mwh",      F.expr("try_cast(volume_mwh as double)"))
         .withColumn("event_date",      F.to_date("event_date"))
         .withColumn("last_updated_ts", F.to_timestamp("last_updated_ts"))
     )
