@@ -16,25 +16,35 @@ resources:
       name: Vattenfall Energy Operations Pipeline
 
       tasks:
+
+        - task_key: setup_uc_objects
+          notebook_task:
+            notebook_path: notebooks/01_setup/01_setup_uc_objects
+          depends_on: []
+
         - task_key: bronze_market_prices
           notebook_task:
             notebook_path: notebooks/02_bronze/01_market_prices_autoloader
-          depends_on: []
+          depends_on:
+            - task_key: setup_uc_objects
 
         - task_key: bronze_weather
           notebook_task:
             notebook_path: notebooks/02_bronze/02_weather_autoloader
-          depends_on: []
+          depends_on:
+            - task_key: setup_uc_objects
 
         - task_key: bronze_grid_events
           notebook_task:
             notebook_path: notebooks/02_bronze/03_grid_events_autoloader
-          depends_on: []
+          depends_on:
+            - task_key: setup_uc_objects
 
         - task_key: bronze_reference
           notebook_task:
             notebook_path: notebooks/02_bronze/04_reference_data_load
-          depends_on: []
+          depends_on:
+            - task_key: setup_uc_objects
 
         - task_key: bronze_validation
           notebook_task:
