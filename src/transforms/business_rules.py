@@ -9,3 +9,12 @@ def add_market_prices_flags(df: DataFrame, rules: dict) -> DataFrame:
             F.when(F.col("price_eur_mwh") >= rules["market_prices"]["high_price_threshold"], 1).otherwise(0)
         )
     )  
+
+def add_weather_flags(df: DataFrame, rules: dict) -> DataFrame:
+    return (
+        df
+        .withColumn(
+            "is_severe_weather",
+            F.when(F.col("weather_alert_level").isin("HIGH", "EXTREME"), 1).otherwise(0)
+        )
+    )    
