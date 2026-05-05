@@ -1,12 +1,13 @@
 # 02 - Architecture Overview
 
-> This document will be expanded once the full pipeline design is confirmed.
-
 ---
 
 ## Platform
 
 This project is built on **Databricks** using the **medallion architecture** - a layered data design pattern that separates raw data from cleaned data from business-ready outputs.
+
+Unity Catalog governs all catalog, schema, table, and volume objects.
+Configuration is centralized in `config/dev.yml` and loaded into every notebook via `%run ./00_config`.
 
 ---
 
@@ -14,40 +15,108 @@ This project is built on **Databricks** using the **medallion architecture** - a
 
 The lakehouse combines four source domains:
 
-- **Energy market prices** - spot prices and market signals
-- **Weather observations** - temperature, wind, and conditions by region
-- **Grid telemetry and incident events** - operational grid data and outage records
-- **Reference data** - locations, assets, and lookup tables
+- **Energy market prices** - spot prices and volume by region and market type
+- **Weather observations** - temperature, wind, precipitation, and alert levels by region
+- **Grid events** - incidents, outages, and severity by asset and region
+- **Reference data** - assets, regions, market types, and weather alert classifications
 
 ---
 
 ## Medallion Layers
 
 ```
-Raw Files (Volumes)
-      |
-      v
-  [ Bronze ]  - raw ingestion, no transformations
-      |
-      v
-  [ Silver ]  - cleaned, validated, enriched
-      |
-      v
-  [ Gold ]    - aggregated, business-ready outputs
+Raw CSV Files (Unity Catalog Volumes)
+            |
+            v
+        [ Bronze ]
+        Raw ingestion via Auto Loader
+        No transformations
+        Source of truth for what arrived
+            |
+            v
+        [ Silver ]
+        Cleaned, standardized, enriched
+        Quality checks applied
+        Trusted layer for analysis
+            |
+            v
+        [ Gold ]
+        Aggregated, business-ready outputs
+        One row per region per day
+        Ready to query or visualize
 ```
 
-**Bronze** - data lands as-is from the source. No changes. The source of truth for what arrived.
+---
 
-**Silver** - data is cleaned, standardized, and enriched. Quality checks run here. This is the trusted layer.
+## Unity Catalog Structure
 
-**Gold** - data is aggregated into business-facing reports. Simple, fast, and ready to query.
+```
+vattenfall_dev/
+├── raw/                          - Bronze layer
+│   ├── volumes/
+│   │   ├── landing/              - Raw CSV files
+│   │   └── checkpoints/          - Auto Loader checkpoints
+│   └── tables/
+│       ├── bronze_market_prices
+│       ├── bronze_weather
+│       ├── bronze_grid_events
+│       ├── bronze_asset_reference
+│       ├── bronze_region_reference
+│       ├── bronze_market_reference
+│       ├── bronze_event_type_reference
+│       └── bronze_weather_alert_reference
+├── refined/                      - Silver layer
+│   └── tables/
+│       ├── silver_market_prices
+│       ├── silver_weather
+│       ├── silver_grid_events
+│       └── silver_integrated
+└── analytics/                    - Gold layer
+    └── tables and views/
+        ├── gold_regional_operations
+        ├── gold_market_volatility
+        └── vw_operational_dashboard
+```
 
 ---
 
-## Governance
+## Pipeline Sequence
 
-Unity Catalog manages all catalog, schema, table, and volume objects. Configuration is stored in `config/project_config.yml` and shared across notebooks via `%run ./00_config`.
+```
+Setup UC objects    
+    01_setup_uc_objects
+        |    
+Bronze ingestion (parallel)
+  01_market_prices_autoloader
+  02_weather_autoloader
+  03_grid_events_autoloader
+  04_reference_data_load
+        |
+  05_bronze_validation
+        |
+Silver transformations (parallel)
+  01_market_prices_silver
+  02_weather_silver
+  03_grid_events_silver
+        |
+  04_integrated_operational_silver
+        |
+  05_silver_validation
+        |
+Gold outputs
+  01_gold_outputs
+        |
+  02_gold_validation
+```
 
 ---
-## TODO
-> Sections to be added: pipeline diagram, job task sequence, data flow per domain.
+
+## Reusable Python Modules
+
+```
+src/
+├── transforms/       - Silver cleaning and standardization functions
+├── udfs/             - PySpark UDFs for classification
+└── utils/
+    └── validation_utils.py  - Shared validation logic across all layers
+```

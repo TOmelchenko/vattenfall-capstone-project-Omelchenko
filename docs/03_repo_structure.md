@@ -8,43 +8,87 @@ This project uses a layered repository structure. Each layer has a single respon
 
 ```
 vattenfall-capstone-project-Omelchenko/
-├── docs/                        # Project documentation
-├── config/                      # Project settings and configuration
-├── sample_data/                 # Raw source data organized by domain
-├── sql/                         # Reusable SQL logic
-├── src/                         # Reusable Python logic
-├── notebooks/                   # Databricks workflow notebooks
-├── tests/                       # Validation and quality checks
-└── .github/workflows/           # Repository automation checks
+├── config/
+│   └── dev.yml                       - All project settings and business rules
+├── docs/
+│   ├── 00_how_to_use_this_repo.md
+│   ├── 01_business_context.md
+│   ├── 02_architecture_overview.md
+│   └── 03_repo_structure.md
+├── notebooks/
+│   ├── 01_setup/
+│   │   ├── 00_config                 - Shared config loader for all notebooks
+│   │   └── 01_setup_uc_objects       - One-time Unity Catalog setup
+│   ├── 02_bronze/
+│   │   ├── 01_market_prices_autoloader
+│   │   ├── 02_weather_autoloader
+│   │   ├── 03_grid_events_autoloader
+│   │   ├── 04_reference_data_load
+│   │   └── 05_bronze_validation
+│   ├── 03_silver/
+│   │   ├── 01_market_prices_silver
+│   │   ├── 02_weather_silver
+│   │   ├── 03_grid_events_silver
+│   │   ├── 04_integrated_operational_silver
+│   │   └── 05_silver_validation
+│   ├── 04_gold/
+│   │   ├── 01_gold_outputs
+│   │   └── 02_gold_validation
+│   └── 05_governance/
+│       └── 01_governance
+├── sample_data/
+│   ├── market_prices/
+│   ├── weather/
+│   ├── grid_events/
+│   └── reference/
+├── src/
+│   ├── transforms/
+│   │   ├── market_prices_cleaning.py
+│   │   ├── weather_cleaning.py
+│   │   ├── grid_events_cleaning.py
+│   │   └── business_rules.py
+│   ├── udfs/
+│   │   ├── market_prices_udfs.py
+│   │   ├── weather_udfs.py
+│   │   └── grid_events_udfs.py
+│   └── utils/
+│       └── validation_utils.py
+├── tests/
+│   ├── test_config_presence.py
+│   ├── test_repo_structure.py
+│   └── test_transform_contracts.py
+├── .github/workflows/                - Repository automation checks
+├── databricks.yml                    - Databricks Asset Bundle job definition
+└── README.md
 ```
 
 ---
 
 ## Layer Descriptions
 
-**`docs/`**
-Contains all project documentation - architecture overview, business context, and usage guides. Written for both technical and non-technical readers.
-
 **`config/`**
-Stores project settings such as catalog names, schema names, volume paths, and business rules. Centralizing configuration here means notebooks and scripts never hardcode values.
+Single source of truth for all project settings - catalog name, schema names, volume paths, table names, and business rules. No values are hardcoded in notebooks.
 
-**`sample_data/`**
-Organizes raw source files by domain - energy market prices, weather observations, grid telemetry, and reference data. Files land here before being ingested into the lakehouse.
-
-**`sql/`**
-Stores reusable SQL - transformation logic, views, and merge statements. Keeping SQL in files rather than inline strings makes it easier to version, test, and review.
-
-**`src/`**
-Contains reusable Python modules shared across notebooks - helper functions, schema definitions, and utility logic. Notebooks import from here instead of duplicating code.
+**`docs/`**
+Project documentation covering business context, architecture, repo structure, and usage guide.
 
 **`notebooks/`**
-Contains the Databricks workflow notebooks that make up the pipeline - one notebook per stage. These are the job tasks that run in sequence.
+Databricks workflow notebooks organized by pipeline stage. Each notebook does one thing and depends on `00_config` for shared variables.
+
+**`sample_data/`**
+Raw CSV files organized by domain. Files are copied into Unity Catalog volumes during the bronze ingestion step.
+
+**`src/`**
+Reusable Python modules imported into notebooks. Split into three subfolders - transforms for cleaning logic, udfs for PySpark user-defined functions, and utils for shared validation logic.
 
 **`tests/`**
-Prepares validation logic - data quality checks, schema assertions, and row count comparisons. Separating tests from pipeline notebooks keeps the workflow clean.
+Validation scripts that run independently of the pipeline. Two files run locally with pytest, one runs as a Databricks notebook.
 
 **`.github/workflows/`**
-Stores GitHub Actions automation - repository checks that run on every push, such as file structure validation or linting.
+GitHub Actions automation that runs repository checks on every push.
+
+**`databricks.yml`**
+Defines the full pipeline as a Databricks Asset Bundle job with task dependencies.
 
 ---
 
