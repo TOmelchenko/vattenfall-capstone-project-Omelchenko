@@ -17,4 +17,13 @@ def add_weather_flags(df: DataFrame, rules: dict) -> DataFrame:
             "is_severe_weather",
             F.when(F.col("weather_alert_level").isin("HIGH", "EXTREME"), 1).otherwise(0)
         )
-    )    
+    )
+
+def add_grid_events_flags(df: DataFrame, rules: dict) -> DataFrame:
+    return (
+        df
+        .withColumn(
+            "is_critical_event",
+            F.when(F.col("severity") == "HIGH", 1).otherwise(0)
+        )
+    )
