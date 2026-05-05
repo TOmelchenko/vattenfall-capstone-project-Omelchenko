@@ -41,6 +41,11 @@ silver_tables:
   grid_events:   silver_grid_events
   integrated:    silver_integrated
 
+gold_tables:
+  regional_operations: gold_regional_operations
+  market_volatility:   gold_market_volatility
+  dashboard_view:      vw_operational_dashboard  
+
 rules:
   market_prices:
     min_price_eur_mwh: 0
