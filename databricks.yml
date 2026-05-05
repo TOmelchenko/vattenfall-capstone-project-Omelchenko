@@ -1,7 +1,6 @@
 bundle:
   name: vattenfall-capstone-project-Omelchenko
 
-
 include:
   - resources/*.yml
 
@@ -10,3 +9,82 @@ targets:
     default: true
     workspace:
       https://dbc-578e1af6-806a.cloud.databricks.com/
+
+resources:
+  jobs:
+    vattenfall_pipeline:
+      name: Vattenfall Energy Operations Pipeline
+
+      tasks:
+        - task_key: bronze_market_prices
+          notebook_task:
+            notebook_path: notebooks/02_bronze/01_market_prices_autoloader
+          depends_on: []
+
+        - task_key: bronze_weather
+          notebook_task:
+            notebook_path: notebooks/02_bronze/02_weather_autoloader
+          depends_on: []
+
+        - task_key: bronze_grid_events
+          notebook_task:
+            notebook_path: notebooks/02_bronze/03_grid_events_autoloader
+          depends_on: []
+
+        - task_key: bronze_reference
+          notebook_task:
+            notebook_path: notebooks/02_bronze/04_reference_data_load
+          depends_on: []
+
+        - task_key: bronze_validation
+          notebook_task:
+            notebook_path: notebooks/02_bronze/05_bronze_validation
+          depends_on:
+            - task_key: bronze_market_prices
+            - task_key: bronze_weather
+            - task_key: bronze_grid_events
+            - task_key: bronze_reference
+
+        - task_key: silver_market_prices
+          notebook_task:
+            notebook_path: notebooks/03_silver/01_market_prices_silver
+          depends_on:
+            - task_key: bronze_validation
+
+        - task_key: silver_weather
+          notebook_task:
+            notebook_path: notebooks/03_silver/02_weather_silver
+          depends_on:
+            - task_key: bronze_validation
+
+        - task_key: silver_grid_events
+          notebook_task:
+            notebook_path: notebooks/03_silver/03_grid_events_silver
+          depends_on:
+            - task_key: bronze_validation
+
+        - task_key: silver_integrated
+          notebook_task:
+            notebook_path: notebooks/03_silver/04_integrated_operational_silver
+          depends_on:
+            - task_key: silver_market_prices
+            - task_key: silver_weather
+            - task_key: silver_grid_events
+
+        - task_key: silver_validation
+          notebook_task:
+            notebook_path: notebooks/03_silver/05_silver_validation
+          depends_on:
+            - task_key: silver_integrated
+
+        - task_key: gold_outputs
+          notebook_task:
+            notebook_path: notebooks/04_gold/01_gold_outputs
+          depends_on:
+            - task_key: silver_validation
+
+        - task_key: gold_validation
+          notebook_task:
+            notebook_path: notebooks/04_gold/02_gold_validation
+          depends_on:
+            - task_key: gold_outputs
