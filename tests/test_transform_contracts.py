@@ -30,8 +30,8 @@ print("Imports successful.")
 # COMMAND ----------
 
 def make_market_prices_df():
-    data = [("2026-05-04", "NORTH", "DAY_AHEAD", "52.6", "1200", "MARKET_FEED_A", "2026-05-04 08:00:00")]
-    schema = "event_date string, region string, market_type string, price_eur_mwh string, volume_mwh string, source_system string, last_updated_ts string"
+    data = [("2026-05-04", "NORTH", "DAY_AHEAD", "52.6", "1200", "MARKET_FEED_A", "2026-05-04 08:00:00", "2026-05-04 08:00:00")]
+    schema = "event_date string, region string, market_type string, price_eur_mwh string, volume_mwh string, source_system string, last_updated_ts string, ingestion_ts string"
     return spark.createDataFrame(data, schema=schema)
 
 
@@ -55,7 +55,7 @@ print("Sample DataFrames ready.")
 # COMMAND ----------
 
 df = standardize_market_prices_columns(make_market_prices_df())
-expected = {"event_date", "region", "market_type", "price_eur_mwh", "volume_mwh", "source_system", "last_updated_ts"}
+expected = {"event_date", "region", "market_type", "price_eur_mwh", "volume_mwh", "source_system", "last_updated_ts", "report_day"}
 missing = expected - set(df.columns)
 assert not missing, f"FAILED: standardize_market_prices_columns missing columns: {missing}"
 print("PASSED: standardize_market_prices_columns returns expected columns.")
@@ -66,8 +66,8 @@ print("PASSED: standardize_market_prices_columns returns expected columns.")
 
 # COMMAND ----------
 
-data = [("2026-05-04", "NORTH", "DAY_AHEAD", "-5.0", "1200", "FEED", "2026-05-04 08:00:00")]
-schema = "event_date string, region string, market_type string, price_eur_mwh string, volume_mwh string, source_system string, last_updated_ts string"
+data = [("2026-05-04", "NORTH", "DAY_AHEAD", "-5.0", "1200", "FEED", "2026-05-04 08:00:00", "2026-05-04 08:00:00")]
+schema = "event_date string, region string, market_type string, price_eur_mwh string, volume_mwh string, source_system string, last_updated_ts string, ingestion_ts string"
 df = spark.createDataFrame(data, schema=schema)
 df = standardize_market_prices_columns(df)
 result = filter_invalid_market_prices_rows(df, rules)
