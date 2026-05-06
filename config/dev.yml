@@ -51,6 +51,12 @@ gold_tables:
   market_volatility:   gold_market_volatility
   dashboard_view:      vw_operational_dashboard  
 
+  market_summary:              gold_market_summary
+  grid_summary:                gold_grid_summary
+  weather_impact:              gold_weather_impact
+  operational_kpi:             gold_operational_kpi
+
+
 rules:
   market_prices:
     min_price_eur_mwh: 0
