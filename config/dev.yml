@@ -40,6 +40,11 @@ silver_tables:
   weather:       silver_weather
   grid_events:   silver_grid_events
   integrated:    silver_integrated
+  asset_reference:         silver_asset_reference
+  region_reference:        silver_region_reference
+  market_reference:        silver_market_reference
+  event_type_reference:    silver_event_type_reference
+  weather_alert_reference: silver_weather_alert_reference
 
 gold_tables:
   regional_operations: gold_regional_operations

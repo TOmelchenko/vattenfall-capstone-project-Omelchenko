@@ -11,6 +11,7 @@ def standardize_market_prices_columns(df: DataFrame) -> DataFrame:
         .withColumn("volume_mwh",      F.expr("try_cast(volume_mwh as double)"))
         .withColumn("event_date",      F.to_date("event_date"))
         .withColumn("last_updated_ts", F.to_timestamp("last_updated_ts"))
+        .withColumn("report_day",      F.to_date("ingestion_ts"))
         .drop("_rescued_data")
     )
 

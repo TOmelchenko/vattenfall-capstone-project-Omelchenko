@@ -73,17 +73,25 @@ resources:
           depends_on:
             - task_key: bronze_validation
 
+        - task_key: silver_reference_data
+          notebook_task:
+            notebook_path: notebooks/03_silver/04_silver_reference_data
+          depends_on:
+            - task_key: bronze_validation              
+              
+
         - task_key: silver_integrated
           notebook_task:
-            notebook_path: notebooks/03_silver/04_integrated_operational_silver
+            notebook_path: notebooks/03_silver/05_integrated_operational_silver
           depends_on:
             - task_key: silver_market_prices
             - task_key: silver_weather
             - task_key: silver_grid_events
+            - task_key: silver_reference_data
 
         - task_key: silver_validation
           notebook_task:
-            notebook_path: notebooks/03_silver/05_silver_validation
+            notebook_path: notebooks/03_silver/06_silver_validation
           depends_on:
             - task_key: silver_integrated
 
