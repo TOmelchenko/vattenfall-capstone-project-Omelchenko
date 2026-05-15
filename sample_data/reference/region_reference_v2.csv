@@ -1,0 +1,4 @@
+region,country_code,operating_zone
+NORTH,DE,ZONE_1
+SOUTH,DE,ZONE_2
+EAST,DE,ZONE_6

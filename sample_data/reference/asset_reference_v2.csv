@@ -1,0 +1,5 @@
+asset_id,asset_name,region,asset_type
+ASSET_001,North Turbine 1,NORTH,WIND_TURBINE
+ASSET_002,North Transformer 2,NORTH,TRANSFORMER
+ASSET_003,North Line Segment 3,NORTH,LINE
+ASSET_050,South Solar Panel 1,SOUTH,SOLAR_PANEL
